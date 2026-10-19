@@ -13,16 +13,17 @@ const adapterDirectory = pluginId.startsWith('arc.') ? pluginId.slice(4) : plugi
 const adapterPath = `adapters/${adapterDirectory}`;
 const manifestRelative = `${adapterPath}/arc-plugin.json`;
 const manifestBytes = fs.readFileSync(path.join(repoRoot, manifestRelative));
-const committedFile = (relativePath, workingBytes) => {
-  const committed = execFileSync('git', ['show', `HEAD:${relativePath}`], { cwd: repoRoot, encoding: 'buffer' });
-  if (!committed.equals(workingBytes)) throw new Error(`Commit ${relativePath} before publishing the adapter.`);
+const committedFile = (relativePath) => {
+  const committedHash = execFileSync('git', ['rev-parse', `HEAD:${relativePath}`], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const workingHash = execFileSync('git', ['hash-object', '--path', relativePath, path.join(repoRoot, relativePath)], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  if (!committedHash || committedHash !== workingHash) throw new Error(`Commit ${relativePath} before publishing the adapter.`);
 };
-committedFile(manifestRelative, manifestBytes);
+committedFile(manifestRelative);
 const manifest = JSON.parse(manifestBytes.toString('utf8'));
 if (manifest.kind !== 'host-adapter' || manifest.id !== pluginId || !manifest.runtime?.module || !manifest.runtime?.sha256) throw new Error('The adapter manifest is missing its host runtime metadata.');
 const runtimeRelative = `${adapterPath}/${manifest.runtime.module}`;
 const runtimeBytes = fs.readFileSync(path.join(repoRoot, runtimeRelative));
-committedFile(runtimeRelative, runtimeBytes);
+committedFile(runtimeRelative);
 const digest = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');
 const runtimeSha256 = digest(runtimeBytes);
 if (runtimeSha256 !== manifest.runtime.sha256.toLowerCase()) throw new Error('Update runtime.sha256 in arc-plugin.json to match the committed runtime.');
@@ -46,7 +47,7 @@ let dependencyPackageCount = 0;
 if (sortedNpmDependencies.length) {
   const lockRelative = `${adapterPath}/package-lock.json`;
   const lockBytes = fs.readFileSync(path.join(repoRoot, lockRelative));
-  committedFile(lockRelative, lockBytes);
+  committedFile(lockRelative);
   if (lockBytes.length > 2 * 1024 * 1024) throw new Error('package-lock.json must be no larger than 2 MiB.');
   const lock = JSON.parse(lockBytes.toString('utf8'));
   const root = lock?.packages?.[''];

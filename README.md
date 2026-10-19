@@ -21,7 +21,7 @@ A catalog is an index, not the plugin itself. Each entry points to an artifact a
 ## Host your own catalog
 
 1. Create a public GitHub or GitLab repository. Put `registry.json` at the repository root and keep it on the `main` branch.
-2. Add versionned Function graph packs or adapter directories, along with the publishing scripts for the formats you use. You can start from this repository or maintain a separate catalog with your own plugins.
+2. Add versioned Function graph packs or adapter directories, along with the publishing scripts for the formats you use. You can start from this repository or maintain a separate catalog with your own plugins.
 3. Commit each plugin artifact before generating its catalog entry. The publisher scripts use the artifact commit as the immutable source revision.
 4. Review and commit the generated `registry.json`, then push both commits to `main`.
 5. In ARC Studio, choose **Plugin Store → Change source** and enter your repository URL.

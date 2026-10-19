@@ -15,12 +15,13 @@ const manifestRelative = `adapters/${adapterDirectory}/arc-plugin.json`;
 const wasmRelative = `adapters/${adapterDirectory}/adapter.wasm`;
 const manifestBytes = fs.readFileSync(path.join(repoRoot, manifestRelative));
 const wasmBytes = fs.readFileSync(path.join(repoRoot, wasmRelative));
-const committedFile = (relativePath, workingBytes) => {
-  const committed = execFileSync('git', ['show', `HEAD:${relativePath}`], { cwd: repoRoot, encoding: 'buffer' });
-  if (!committed.equals(workingBytes)) throw new Error(`Commit ${relativePath} before publishing the adapter.`);
+const committedFile = (relativePath) => {
+  const committedHash = execFileSync('git', ['rev-parse', `HEAD:${relativePath}`], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  const workingHash = execFileSync('git', ['hash-object', '--path', relativePath, path.join(repoRoot, relativePath)], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  if (!committedHash || committedHash !== workingHash) throw new Error(`Commit ${relativePath} before publishing the adapter.`);
 };
-committedFile(manifestRelative, manifestBytes);
-committedFile(wasmRelative, wasmBytes);
+committedFile(manifestRelative);
+committedFile(wasmRelative);
 
 const manifest = JSON.parse(manifestBytes.toString('utf8'));
 const sha256 = (bytes) => crypto.createHash('sha256').update(bytes).digest('hex');

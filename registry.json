@@ -152,6 +152,42 @@
       "npmDependencies": [],
       "dependencyLockSha256": "",
       "dependencyPackageCount": 0
+    },
+    {
+      "kind": "wasm-adapter",
+      "id": "arc.resvg",
+      "name": "Resvg SVG Renderer",
+      "version": "0.1.0",
+      "description": "Render bounded SVG input to PNG bytes.",
+      "author": "relentiousdragon",
+      "license": "MIT",
+      "tags": [],
+      "arcApiVersion": 1,
+      "minArcStudioVersion": "2026.1.1-alpha.6",
+      "commit": "b9a9315b23f69f9fddb98bd07f403009a20b8ee8",
+      "path": "adapters/resvg/arc-plugin.json",
+      "sha256": "767ab16b71f0c6e93fc7589268e31bd8bd58fc601a1528af403a4ea365cc9563",
+      "wasmSha256": "1995f204f34087fabe52d40242719f9c67c15022c49eb76fc236dfeb06f4625b",
+      "nodeTypes": [
+        "arc.resvg.render-svg"
+      ],
+      "settingsSchema": [],
+      "thirdPartyNotices": [
+        {
+          "name": "resvg",
+          "version": "0.48.1",
+          "license": "MIT (chosen from Apache-2.0 OR MIT)",
+          "sourceUrl": "https://github.com/linebender/resvg/blob/v0.48.1/LICENSE-MIT",
+          "notice": "Copyright 2017 the Resvg Authors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the Software), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+        },
+        {
+          "name": "Rust dependencies",
+          "version": "Cargo.lock",
+          "license": "Per crate",
+          "sourceUrl": "https://github.com/relentiousdragon/arc-plugins/blob/main/adapters/resvg/THIRD_PARTY_NOTICES.md",
+          "notice": "The Cargo.lock dependency versions and their applicable license texts are listed in THIRD_PARTY_NOTICES.md alongside this adapter source."
+        }
+      ]
     }
   ]
 }

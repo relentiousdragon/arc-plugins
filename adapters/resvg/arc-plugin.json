@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "kind": "wasm-adapter",
+  "id": "arc.resvg",
+  "name": "Resvg SVG Renderer",
+  "version": "0.1.0",
+  "minArcStudioVersion": "2026.1.1-alpha.6",
+  "description": "Render bounded SVG input to PNG bytes.",
+  "author": "relentiousdragon",
+  "license": "MIT",
+  "thirdPartyNotices": [
+    {
+      "name": "resvg",
+      "version": "0.48.1",
+      "license": "MIT (chosen from Apache-2.0 OR MIT)",
+      "sourceUrl": "https://github.com/linebender/resvg/blob/v0.48.1/LICENSE-MIT",
+      "notice": "Copyright 2017 the Resvg Authors.\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the Software), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE."
+    },
+    {
+      "name": "Rust dependencies",
+      "version": "Cargo.lock",
+      "license": "Per crate",
+      "sourceUrl": "https://github.com/relentiousdragon/arc-studio/blob/main/arc-plugins/adapters/resvg/Cargo.lock",
+      "notice": "This WebAssembly build also includes Rust crates pinned in Cargo.lock. Each crate retains its own license and attribution requirements. Consult the license metadata and license files for the exact locked crate versions before redistributing a rebuilt adapter."
+    }
+  ],
+  "adapterApiVersion": 1,
+  "wasmArtifact": "adapter.wasm",
+  "wasmSha256": "1995f204f34087fabe52d40242719f9c67c15022c49eb76fc236dfeb06f4625b",
+  "capabilities": [],
+  "limits": {
+    "inputBytes": 1048576,
+    "outputBytes": 4194304,
+    "maxDimension": 4096,
+    "maxPixels": 16777216,
+    "timeoutMs": 5000
+  },
+  "nodes": [
+    {
+      "type": "arc.resvg.render-svg",
+      "label": "Render SVG",
+      "category": "Images",
+      "description": "Render SVG markup to PNG bytes.",
+      "color": "#36a981",
+      "inputs": [
+        { "id": "exec", "label": "Exec", "type": "exec" },
+        { "id": "svg", "label": "SVG", "type": "string", "defaultValue": "" }
+      ],
+      "outputs": [
+        { "id": "exec", "label": "Exec", "type": "exec" },
+        { "id": "png", "label": "PNG data URL", "type": "string" },
+        { "id": "width", "label": "Width", "type": "number" },
+        { "id": "height", "label": "Height", "type": "number" }
+      ]
+    }
+  ]
+}

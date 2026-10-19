@@ -1,0 +1,910 @@
+{
+  "schemaVersion": 1,
+  "kind": "host-adapter",
+  "id": "arc.mongodb",
+  "name": "MongoDB",
+  "version": "1.0.0",
+  "minArcStudioVersion": "2026.1.1-alpha.6",
+  "description": "Connect project graphs to MongoDB with typed CRUD and query nodes.",
+  "author": "ARC Studio",
+  "license": "MIT",
+  "tags": [
+    "database",
+    "mongodb",
+    "storage"
+  ],
+  "repositoryUrl": "https://github.com/relentiousdragon/arc-plugins",
+  "sourceUrl": "https://github.com/relentiousdragon/arc-plugins/tree/main/adapters/mongodb",
+  "runtime": {
+    "module": "runtime.js",
+    "execute": "executeMongoNode",
+    "closeProject": "closeMongoProjectConnection",
+    "sha256": "0b693ad6a9608d2e92edd346b59f05c10cb018405b4d0647300c0acd77de87cc"
+  },
+  "export": {
+    "files": [
+      "LICENSE"
+    ],
+    "dependencies": {
+      "mongodb": "^6.21.0"
+    },
+    "environment": [
+      {
+        "name": "MONGODB_URI",
+        "description": "MongoDB connection string",
+        "required": true
+      },
+      {
+        "name": "MONGODB_DATABASE",
+        "description": "Default database (optional when included in the URI)",
+        "required": false
+      }
+    ],
+    "runtimeConfig": {
+      "connectionString": {
+        "env": "MONGODB_URI"
+      },
+      "database": {
+        "env": "MONGODB_DATABASE",
+        "defaultValue": ""
+      },
+      "__projectDir": {
+        "value": "exported-bot"
+      }
+    }
+  },
+  "thirdPartyNotices": [
+    {
+      "name": "MongoDB Node.js Driver",
+      "version": "6.21.0",
+      "license": "Apache-2.0",
+      "sourceUrl": "https://github.com/mongodb/node-mongodb-native/blob/main/LICENSE.md",
+      "notice": "MongoDB Node.js Driver is distributed under the Apache License 2.0."
+    }
+  ],
+  "permissions": [
+    {
+      "id": "mongodb.read",
+      "name": "Read database data",
+      "description": "Read documents, counts, distinct values, aggregation results, and collection names."
+    },
+    {
+      "id": "mongodb.write",
+      "name": "Change database data",
+      "description": "Insert, update, or delete documents in configured databases."
+    },
+    {
+      "id": "mongodb.schema",
+      "name": "Change database structure",
+      "description": "Create indexes on configured collections."
+    }
+  ],
+  "settingsSchema": [
+    {
+      "id": "host",
+      "label": "Host",
+      "type": "string",
+      "defaultValue": "127.0.0.1",
+      "required": true,
+      "group": "Connection"
+    },
+    {
+      "id": "port",
+      "label": "Port",
+      "type": "number",
+      "defaultValue": 27017,
+      "min": 1,
+      "max": 65535,
+      "group": "Connection"
+    },
+    {
+      "id": "database",
+      "label": "Default database",
+      "type": "string",
+      "required": true,
+      "group": "Connection"
+    },
+    {
+      "id": "username",
+      "label": "Username",
+      "type": "string",
+      "group": "Authentication"
+    },
+    {
+      "id": "password",
+      "label": "Password",
+      "type": "string",
+      "secret": true,
+      "group": "Authentication"
+    },
+    {
+      "id": "authSource",
+      "label": "Authentication database",
+      "type": "string",
+      "defaultValue": "admin",
+      "group": "Authentication"
+    },
+    {
+      "id": "srv",
+      "label": "Use DNS SRV (MongoDB Atlas)",
+      "type": "boolean",
+      "defaultValue": false,
+      "group": "Connection"
+    },
+    {
+      "id": "tls",
+      "label": "Use TLS",
+      "type": "boolean",
+      "defaultValue": true,
+      "group": "TLS"
+    },
+    {
+      "id": "replicaSet",
+      "label": "Replica set",
+      "type": "string",
+      "group": "Advanced"
+    },
+    {
+      "id": "serverSelectionTimeoutMS",
+      "label": "Server selection timeout (ms)",
+      "type": "number",
+      "defaultValue": 5000,
+      "min": 1000,
+      "max": 30000,
+      "group": "Advanced"
+    },
+    {
+      "id": "maxPoolSize",
+      "label": "Maximum connections",
+      "type": "number",
+      "defaultValue": 10,
+      "min": 1,
+      "max": 50,
+      "group": "Advanced"
+    }
+  ],
+  "nodes": [
+    {
+      "type": "arc.mongodb.validate-document",
+      "label": "Validate Document",
+      "category": "MongoDB",
+      "description": "Validate JSON against the supported JSON Schema subset. This node runs locally and does not connect to MongoDB.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "document",
+          "label": "Document",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        },
+        {
+          "id": "schema",
+          "label": "JSON Schema",
+          "type": "string",
+          "defaultValue": "{\n  \"type\": \"object\",\n  \"properties\": {},\n  \"required\": []\n}",
+          "editor": "json-schema"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "valid",
+          "label": "Valid",
+          "type": "boolean"
+        },
+        {
+          "id": "errors",
+          "label": "Validation errors (JSON)",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.find-one",
+      "requiredPermission": "mongodb.read",
+      "label": "Find One",
+      "category": "MongoDB",
+      "description": "Find one document matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "found",
+          "label": "Found",
+          "type": "boolean"
+        },
+        {
+          "id": "document",
+          "label": "Document (JSON)",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.find-many",
+      "requiredPermission": "mongodb.read",
+      "label": "Find Many",
+      "category": "MongoDB",
+      "description": "Find up to 500 documents matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        },
+        {
+          "id": "limit",
+          "label": "Limit",
+          "type": "number",
+          "defaultValue": 100
+        },
+        {
+          "id": "projection",
+          "label": "Projection",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "documents",
+          "label": "Documents (JSON)",
+          "type": "string"
+        },
+        {
+          "id": "count",
+          "label": "Count",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.insert-one",
+      "requiredPermission": "mongodb.write",
+      "label": "Insert One",
+      "category": "MongoDB",
+      "description": "Insert one JSON document.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "document",
+          "label": "Document",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "inserted_id",
+          "label": "Inserted ID",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.insert-many",
+      "requiredPermission": "mongodb.write",
+      "label": "Insert Many",
+      "category": "MongoDB",
+      "description": "Insert up to 100 JSON documents.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "documents",
+          "label": "Documents",
+          "type": "string",
+          "defaultValue": "[]",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "inserted_count",
+          "label": "Inserted",
+          "type": "number"
+        },
+        {
+          "id": "inserted_ids",
+          "label": "Inserted IDs (JSON)",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.update-one",
+      "requiredPermission": "mongodb.write",
+      "label": "Update One",
+      "category": "MongoDB",
+      "description": "Update the first document matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        },
+        {
+          "id": "update",
+          "label": "Update document",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        },
+        {
+          "id": "upsert",
+          "label": "Create if missing",
+          "type": "boolean",
+          "defaultValue": false
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "matched_count",
+          "label": "Matched",
+          "type": "number"
+        },
+        {
+          "id": "modified_count",
+          "label": "Modified",
+          "type": "number"
+        },
+        {
+          "id": "upserted_id",
+          "label": "Upserted ID",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.update-many",
+      "requiredPermission": "mongodb.write",
+      "label": "Update Many",
+      "category": "MongoDB",
+      "description": "Update all documents matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        },
+        {
+          "id": "update",
+          "label": "Update document",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        },
+        {
+          "id": "upsert",
+          "label": "Create if missing",
+          "type": "boolean",
+          "defaultValue": false
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "matched_count",
+          "label": "Matched",
+          "type": "number"
+        },
+        {
+          "id": "modified_count",
+          "label": "Modified",
+          "type": "number"
+        },
+        {
+          "id": "upserted_id",
+          "label": "Upserted ID",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.delete-one",
+      "requiredPermission": "mongodb.write",
+      "label": "Delete One",
+      "category": "MongoDB",
+      "description": "Delete the first document matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "deleted_count",
+          "label": "Deleted",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.delete-many",
+      "requiredPermission": "mongodb.write",
+      "label": "Delete Many",
+      "category": "MongoDB",
+      "description": "Delete all documents matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "deleted_count",
+          "label": "Deleted",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.count",
+      "requiredPermission": "mongodb.read",
+      "label": "Count Documents",
+      "category": "MongoDB",
+      "description": "Count documents matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "count",
+          "label": "Count",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.distinct",
+      "requiredPermission": "mongodb.read",
+      "label": "Distinct Values",
+      "category": "MongoDB",
+      "description": "Get unique values for a field matching a filter.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "field",
+          "label": "Field path",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "filter",
+          "label": "Filter",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "values",
+          "label": "Values (JSON)",
+          "type": "string"
+        },
+        {
+          "id": "count",
+          "label": "Count",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.aggregate",
+      "requiredPermission": "mongodb.read",
+      "label": "Aggregate",
+      "category": "MongoDB",
+      "description": "Run a bounded aggregation pipeline. Output and time limits apply.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "pipeline",
+          "label": "Pipeline",
+          "type": "string",
+          "defaultValue": "[]",
+          "editor": "json"
+        },
+        {
+          "id": "limit",
+          "label": "Limit",
+          "type": "number",
+          "defaultValue": 100
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "documents",
+          "label": "Documents (JSON)",
+          "type": "string"
+        },
+        {
+          "id": "count",
+          "label": "Count",
+          "type": "number"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.create-index",
+      "requiredPermission": "mongodb.schema",
+      "label": "Create Index",
+      "category": "MongoDB",
+      "description": "Create or reuse an index for the collection.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "collection",
+          "label": "Collection",
+          "type": "string",
+          "defaultValue": ""
+        },
+        {
+          "id": "keys",
+          "label": "Index keys",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        },
+        {
+          "id": "options",
+          "label": "Index options",
+          "type": "string",
+          "defaultValue": "{}",
+          "editor": "json"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "index_name",
+          "label": "Index name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "type": "arc.mongodb.list-collections",
+      "requiredPermission": "mongodb.read",
+      "label": "List Collections",
+      "category": "MongoDB",
+      "description": "List collection names in the selected database.",
+      "color": "#36a981",
+      "inputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "database",
+          "label": "Database (must match project setting)",
+          "type": "string",
+          "defaultValue": ""
+        }
+      ],
+      "outputs": [
+        {
+          "id": "exec",
+          "label": "Exec",
+          "type": "exec"
+        },
+        {
+          "id": "collections",
+          "label": "Collections (JSON)",
+          "type": "string"
+        },
+        {
+          "id": "count",
+          "label": "Count",
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "provider": "mongodb",
+  "runtimeDependencies": [
+    "mongodb"
+  ]
+}

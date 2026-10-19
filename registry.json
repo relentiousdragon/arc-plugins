@@ -1,4 +1,157 @@
 {
   "schemaVersion": 1,
-  "plugins": []
+  "plugins": [
+    {
+      "kind": "host-adapter",
+      "id": "arc.mongodb",
+      "name": "MongoDB",
+      "version": "1.0.0",
+      "description": "Connect project graphs to MongoDB with typed CRUD and query nodes.",
+      "author": "ARC Studio",
+      "license": "MIT",
+      "tags": [
+        "database",
+        "mongodb",
+        "storage"
+      ],
+      "arcApiVersion": 1,
+      "minArcStudioVersion": "2026.1.1-alpha.6",
+      "commit": "6408b192331fbb8510e668852d157225109d213e",
+      "path": "adapters/mongodb/arc-plugin.json",
+      "sha256": "78f6f411ffaeb46b6857c701232573ef39d6d8d16b7fd16927be6225d2728a7e",
+      "runtimeSha256": "63b14cd1da2b2b08f49b874ee464a69e598a7f2b7e5fd41dc7c91789373998af",
+      "nodeTypes": [
+        "arc.mongodb.validate-document",
+        "arc.mongodb.find-one",
+        "arc.mongodb.find-many",
+        "arc.mongodb.insert-one",
+        "arc.mongodb.insert-many",
+        "arc.mongodb.update-one",
+        "arc.mongodb.update-many",
+        "arc.mongodb.delete-one",
+        "arc.mongodb.delete-many",
+        "arc.mongodb.count",
+        "arc.mongodb.distinct",
+        "arc.mongodb.aggregate",
+        "arc.mongodb.create-index",
+        "arc.mongodb.list-collections"
+      ],
+      "permissions": [
+        {
+          "id": "mongodb.read",
+          "name": "Read database data",
+          "description": "Read documents, counts, distinct values, aggregation results, and collection names."
+        },
+        {
+          "id": "mongodb.write",
+          "name": "Change database data",
+          "description": "Insert, update, or delete documents in configured databases."
+        },
+        {
+          "id": "mongodb.schema",
+          "name": "Change database structure",
+          "description": "Create indexes on configured collections."
+        }
+      ],
+      "settingsSchema": [
+        {
+          "id": "host",
+          "label": "Host",
+          "type": "string",
+          "defaultValue": "127.0.0.1",
+          "required": true,
+          "group": "Connection"
+        },
+        {
+          "id": "port",
+          "label": "Port",
+          "type": "number",
+          "defaultValue": 27017,
+          "min": 1,
+          "max": 65535,
+          "group": "Connection"
+        },
+        {
+          "id": "database",
+          "label": "Default database",
+          "type": "string",
+          "required": true,
+          "group": "Connection"
+        },
+        {
+          "id": "username",
+          "label": "Username",
+          "type": "string",
+          "group": "Authentication"
+        },
+        {
+          "id": "password",
+          "label": "Password",
+          "type": "string",
+          "secret": true,
+          "group": "Authentication"
+        },
+        {
+          "id": "authSource",
+          "label": "Authentication database",
+          "type": "string",
+          "defaultValue": "admin",
+          "group": "Authentication"
+        },
+        {
+          "id": "srv",
+          "label": "Use DNS SRV (MongoDB Atlas)",
+          "type": "boolean",
+          "defaultValue": false,
+          "group": "Connection"
+        },
+        {
+          "id": "tls",
+          "label": "Use TLS",
+          "type": "boolean",
+          "defaultValue": true,
+          "group": "TLS"
+        },
+        {
+          "id": "replicaSet",
+          "label": "Replica set",
+          "type": "string",
+          "group": "Advanced"
+        },
+        {
+          "id": "serverSelectionTimeoutMS",
+          "label": "Server selection timeout (ms)",
+          "type": "number",
+          "defaultValue": 5000,
+          "min": 1000,
+          "max": 30000,
+          "group": "Advanced"
+        },
+        {
+          "id": "maxPoolSize",
+          "label": "Maximum connections",
+          "type": "number",
+          "defaultValue": 10,
+          "min": 1,
+          "max": 50,
+          "group": "Advanced"
+        }
+      ],
+      "thirdPartyNotices": [
+        {
+          "name": "MongoDB Node.js Driver",
+          "version": "6.21.0",
+          "license": "Apache-2.0",
+          "sourceUrl": "https://github.com/mongodb/node-mongodb-native/blob/main/LICENSE.md",
+          "notice": "MongoDB Node.js Driver is distributed under the Apache License 2.0."
+        }
+      ],
+      "runtimeDependencies": [
+        "mongodb"
+      ],
+      "npmDependencies": [],
+      "dependencyLockSha256": "",
+      "dependencyPackageCount": 0
+    }
+  ]
 }

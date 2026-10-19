@@ -18,8 +18,9 @@ const [, pluginId, version] = match;
 const packPath = path.join(repoRoot, normalizedPath);
 const packBytes = fs.readFileSync(packPath);
 if (packBytes.length > 1024 * 1024) throw new Error('Function graph packs cannot exceed 1 MiB.');
-const committedPack = execFileSync('git', ['show', `HEAD:${normalizedPath}`], { cwd: repoRoot, encoding: 'buffer' });
-if (!committedPack.equals(packBytes)) throw new Error('Commit the pack file before publishing its registry entry.');
+const committedHash = execFileSync('git', ['rev-parse', `HEAD:${normalizedPath}`], { cwd: repoRoot, encoding: 'utf8' }).trim();
+const workingHash = execFileSync('git', ['hash-object', '--path', normalizedPath, packPath], { cwd: repoRoot, encoding: 'utf8' }).trim();
+if (!committedHash || committedHash !== workingHash) throw new Error('Commit the pack file before publishing its registry entry.');
 
 let pack;
 try { pack = JSON.parse(packBytes.toString('utf8')); }

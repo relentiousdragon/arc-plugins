@@ -20,8 +20,8 @@
       "name": "Rust dependencies",
       "version": "Cargo.lock",
       "license": "Per crate",
-      "sourceUrl": "https://github.com/relentiousdragon/arc-studio/blob/main/arc-plugins/adapters/resvg/Cargo.lock",
-      "notice": "This WebAssembly build also includes Rust crates pinned in Cargo.lock. Each crate retains its own license and attribution requirements. Consult the license metadata and license files for the exact locked crate versions before redistributing a rebuilt adapter."
+      "sourceUrl": "https://github.com/relentiousdragon/arc-plugins/blob/main/adapters/resvg/THIRD_PARTY_NOTICES.md",
+      "notice": "The Cargo.lock dependency versions and their applicable license texts are listed in THIRD_PARTY_NOTICES.md alongside this adapter source."
     }
   ],
   "adapterApiVersion": 1,

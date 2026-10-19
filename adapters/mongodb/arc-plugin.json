@@ -19,7 +19,7 @@
     "module": "runtime.js",
     "execute": "executeMongoNode",
     "closeProject": "closeMongoProjectConnection",
-    "sha256": "0b693ad6a9608d2e92edd346b59f05c10cb018405b4d0647300c0acd77de87cc"
+    "sha256": "63b14cd1da2b2b08f49b874ee464a69e598a7f2b7e5fd41dc7c91789373998af"
   },
   "export": {
     "files": [

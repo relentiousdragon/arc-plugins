@@ -86,11 +86,13 @@ For a WASM adapter, build the module and update `wasmSha256` in the manifest to 
 node scripts/publish-wasm-adapter.mjs <plugin-id>
 ```
 
-For a host adapter, update `runtime.sha256` to match the runtime file, commit both files, then run:
+For a host adapter, update `runtime.sha256` to match the runtime file. Use `runtimeDependencies` for packages already supplied by ARC Studio. To ship another npm package, declare its exact name and version in `npmDependencies`, create and commit an npm v2 or v3 `package-lock.json` beside the adapter files, and ensure the lock contains only `registry.npmjs.org` packages with SHA-512 integrity and no install scripts. Direct lockfile dependencies must match the manifest exactly. Then commit the manifest, runtime, and lockfile and run:
 
 ```sh
 node scripts/publish-adapter.mjs <plugin-id>
 ```
+
+The publisher verifies the committed files and lock, then records the lock digest and package count in `registry.json`. ARC Studio shows direct dependencies and versions in the install review, then installs the pinned tree into that adapter private directory with npm scripts disabled. Host adapter code and its packages still run with the server account OS access, the adapter permission declarations do not sandbox that code.
 
 For example, the IDs in this repository are `arc.resvg` and `arc.mongodb`. Each publisher checks that the adapter files are committed, writes or replaces that plugin's entry in `registry.json`, and pins the entry to the current commit. Review and commit the registry change, then push it. To release an adapter update, increment its manifest version and publish the updated files in a new commit. The old files remain available at the old pinned commit even when the current manifest path changes.
 

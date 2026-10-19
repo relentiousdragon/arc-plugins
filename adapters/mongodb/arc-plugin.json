@@ -6,7 +6,7 @@
   "version": "1.0.0",
   "minArcStudioVersion": "2026.1.1-alpha.6",
   "description": "Connect project graphs to MongoDB with typed CRUD and query nodes.",
-  "author": "ARC Studio",
+  "author": "relentiousdragon",
   "license": "MIT",
   "tags": [
     "database",
